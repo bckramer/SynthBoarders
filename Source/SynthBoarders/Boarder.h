@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Runtime/Engine/Classes/Components/BoxComponent.h"
+#include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Pawn.h"
 #include "Boarder.generated.h"
@@ -47,19 +48,33 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		float RotationSpeed = 1.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-		float RotationCorrectionSpeed = 1.0f;
+		float RotationInterpSpeed = 1.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		float MaxRotation = 1.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+		float RollSpeed = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+		float RollSensitivity = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		float InterpSpeed = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+		float CameraOffset = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+		float CameraLocationLag = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+		float CameraRotationLag = 1.0f;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float ZBuffer = 3.0f;
 
-
 	FVector DesiredLocation = FVector(0.0f, 0.0f, 0.0f);
+	FRotator NewRotation = FRotator(0.0f, 0.0f, 0.0f);
+	FRotator NewRiderRotation = FRotator(0.0f, 0.0f, 0.0f);
 
 	//Input functions
+	void AdjustCamera(float DeltaTime);
 	void Move_XAxis(float AxisValue);
 	void Move_YAxis(float AxisValue);
 

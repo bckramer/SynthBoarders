@@ -16,6 +16,7 @@ ABoarder::ABoarder()
 	Board->SetupAttachment(Rider);
 
 	CameraSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraSpringArm"));
+	CameraSpringArm->SetupAttachment(Rider);
 	MainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("MainCamera"));
 	MainCamera->SetupAttachment(CameraSpringArm, USpringArmComponent::SocketName);
 
@@ -34,8 +35,13 @@ void ABoarder::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	FVector forwardVector = ForwardVelocity * GetActorForwardVector();
+	NewRotation.Roll = GetActorRotation().Roll;
+	NewRotation.Pitch = GetActorRotation().Pitch;
 	SetActorLocation(FMath::VInterpTo(GetActorLocation(), GetActorLocation() + DesiredLocation + forwardVector, DeltaTime, InterpSpeed));
-	//SetActorRotation(FMath::RInterpTo(GetActorRotation(), FRotator(GetActorRotation().Pitch, 0.0f, 0.0f), DeltaTime, RotationCorrectionSpeed));
+	SetActorRotation(FMath::RInterpTo(GetActorRotation(), NewRotation, DeltaTime, RotationInterpSpeed));
+	Rider->SetRelativeRotation(FMath::RInterpTo(Rider->RelativeRotation, NewRiderRotation, DeltaTime, RollSensitivity));
+
+	AdjustCamera(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -54,5 +60,19 @@ void ABoarder::Move_XAxis(float AxisValue)
 
 void ABoarder::Move_YAxis(float AxisValue)
 {
-	DesiredLocation.Y = (AxisValue * MovementSpeed);
+	//DesiredLocation.Y = (AxisValue * MovementSpeed);
+	NewRiderRotation.Roll = (AxisValue * RollSpeed);
+	NewRotation.Yaw = FMath::Clamp(GetActorRotation().Yaw + (AxisValue * RotationSpeed), -MaxRotation, MaxRotation);
 }
+
+void ABoarder::AdjustCamera(float DeltaTime)
+{
+	FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(CameraSpringArm->GetComponentLocation(), GetActorLocation());
+	CameraSpringArm->SetWorldLocation(FMath::VInterpTo(CameraSpringArm->GetComponentLocation(),
+		GetActorLocation() + (UKismetMathLibrary::GetForwardVector(LookAtRotation) * FVector(-CameraOffset, -CameraOffset, CameraOffset)), DeltaTime, CameraLocationLag));
+
+	CameraSpringArm->SetWorldRotation(FMath::RInterpTo(CameraSpringArm->GetComponentRotation(), FRotator(LookAtRotation.Pitch, LookAtRotation.Yaw, 0.0f), DeltaTime, CameraRotationLag));
+}
+
+
+
