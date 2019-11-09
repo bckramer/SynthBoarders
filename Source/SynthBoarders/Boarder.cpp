@@ -34,10 +34,13 @@ void ABoarder::BeginPlay()
 void ABoarder::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	FVector forwardVector = ForwardVelocity * GetActorForwardVector();
+	ForwardVector = ForwardVector + (ForwardVelocity * GetActorForwardVector());
+	FVector NewForward = FMath::VInterpTo(ForwardVector, ForwardVector.GetClampedToMaxSize(MaxVelocity), DeltaTime, Acceleration);
+	ForwardVector.X = NewForward.X;
+	ForwardVector.Y = NewForward.Y;
+	ForwardVector.Z = NewForward.Z;
 	NewRotation.Roll = GetActorRotation().Roll;
-	NewRotation.Pitch = GetActorRotation().Pitch;
-	SetActorLocation(FMath::VInterpTo(GetActorLocation(), GetActorLocation() + DesiredLocation + forwardVector, DeltaTime, InterpSpeed));
+	SetActorLocation(FMath::VInterpTo(GetActorLocation(), GetActorLocation() + DesiredLocation + ForwardVector, DeltaTime, InterpSpeed));
 	SetActorRotation(FMath::RInterpTo(GetActorRotation(), NewRotation, DeltaTime, RotationInterpSpeed));
 	Rider->SetRelativeRotation(FMath::RInterpTo(Rider->RelativeRotation, NewRiderRotation, DeltaTime, RollSensitivity));
 
@@ -55,14 +58,30 @@ void ABoarder::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ABoarder::Move_XAxis(float AxisValue)
 {
-	DesiredLocation.X = (AxisValue * MovementSpeed);
+	//DesiredLocation.X = (AxisValue * MovementSpeed);
+	if (!Grounded) 
+	{
+		FRotator Rotator = FRotator(AxisValue * (InAirRotationSpeed / FlipModifier), 0.0f, 0.0f);
+		AddActorWorldRotation(Rotator.Quaternion());
+		//if (GEngine)
+		//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Move XAxis Pitch: %f"), NewRotation.Pitch));
+	}
 }
 
 void ABoarder::Move_YAxis(float AxisValue)
 {
 	//DesiredLocation.Y = (AxisValue * MovementSpeed);
-	NewRiderRotation.Roll = (AxisValue * RollSpeed);
-	NewRotation.Yaw = FMath::Clamp(GetActorRotation().Yaw + (AxisValue * RotationSpeed), -MaxRotation, MaxRotation);
+	if (Grounded)
+	{
+		NewRiderRotation.Roll = (AxisValue * RollSpeed);
+		NewRotation.Yaw = FMath::Clamp(GetActorRotation().Yaw + (AxisValue * RotationSpeed), -MaxRotation, MaxRotation);
+	}
+	else
+	{
+		NewRotation.Yaw = GetActorRotation().Yaw + (AxisValue * InAirRotationSpeed);
+		//if (GEngine)
+		//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Move YAxis Yaw: %f"), NewRotation.Yaw));
+	}
 }
 
 void ABoarder::AdjustCamera(float DeltaTime)

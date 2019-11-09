@@ -46,7 +46,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		float ForwardVelocity = 1.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+		float MaxVelocity = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		float RotationSpeed = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+		float InAirRotationSpeed = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+		float FlipModifier = 5.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		float RotationInterpSpeed = 1.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
@@ -57,6 +63,10 @@ public:
 		float RollSensitivity = 1.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		float InterpSpeed = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+		float Acceleration = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+		bool Grounded = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 		float CameraOffset = 1.0f;
@@ -65,10 +75,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 		float CameraRotationLag = 1.0f;
 
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float ZBuffer = 3.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int TotalScore = 0;
 
+	FVector ForwardVector = FVector(0.0f, 0.0f, 0.0f);
 	FVector DesiredLocation = FVector(0.0f, 0.0f, 0.0f);
 	FRotator NewRotation = FRotator(0.0f, 0.0f, 0.0f);
 	FRotator NewRiderRotation = FRotator(0.0f, 0.0f, 0.0f);
