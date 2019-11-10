@@ -95,6 +95,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Score")
 		int TierThreeThreshold = 16000;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	FVector ForwardVector = FVector(0.0f, 0.0f, 0.0f);
 	FVector DesiredLocation = FVector(0.0f, 0.0f, 0.0f);
 	FRotator NewRotation = FRotator(0.0f, 0.0f, 0.0f);

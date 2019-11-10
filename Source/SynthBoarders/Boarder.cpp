@@ -37,11 +37,13 @@ void ABoarder::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	ForwardVector = ForwardVector + (ForwardVelocity * GetActorForwardVector());
 	FVector NewForward = FMath::VInterpTo(ForwardVector, ForwardVector.GetClampedToMaxSize(MaxVelocity), DeltaTime, Acceleration);
-	ForwardVector.X = NewForward.X;
+	ForwardVector.X = FMath::Clamp(NewForward.X, 0.0f, 500.0f);
 	ForwardVector.Y = NewForward.Y;
 	ForwardVector.Z = NewForward.Z;
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("X: %f Y: %f Z: %f"), ForwardVector.X, ForwardVector.Y, ForwardVector.Z));
 	NewRotation.Roll = GetActorRotation().Roll;
-	SetActorLocation(FMath::VInterpTo(GetActorLocation(), GetActorLocation() + DesiredLocation + ForwardVector, DeltaTime, InterpSpeed));
+	SetActorLocation(FMath::VInterpTo(GetActorLocation(), GetActorLocation() + ForwardVector, DeltaTime, InterpSpeed));
 	SetActorRotation(FMath::RInterpTo(GetActorRotation(), NewRotation, DeltaTime, RotationInterpSpeed));
 	Rider->SetRelativeRotation(FMath::RInterpTo(Rider->RelativeRotation, NewRiderRotation, DeltaTime, RollSensitivity));
 
