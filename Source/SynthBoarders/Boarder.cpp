@@ -28,6 +28,7 @@ void ABoarder::BeginPlay()
 {
 	Super::BeginPlay();
 	CurrentTierTheshold = TierOneThreshold;
+	OriginalForwardVelocity = MaxVelocity;
 	
 }
 
@@ -39,7 +40,13 @@ void ABoarder::Tick(float DeltaTime)
 	FVector NewForward = FMath::VInterpTo(ForwardVector, ForwardVector.GetClampedToMaxSize(MaxVelocity), DeltaTime, Acceleration);
 	ForwardVector.X = FMath::Clamp(NewForward.X, 0.0f, MaxVelocity);
 	ForwardVector.Y = NewForward.Y;
-	ForwardVector.Z = NewForward.Z;
+	if (Grounded) {
+		ForwardVector.Z = -100.0f;
+	}
+	else {
+		ForwardVector.Z = NewForward.Z;
+	}
+	
 	// if (GEngine)
 	//  	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("X: %f Y: %f Z: %f"), ForwardVector.X, ForwardVector.Y, ForwardVector.Z));
 	NewRotation.Roll = GetActorRotation().Roll;
@@ -57,11 +64,11 @@ void ABoarder::Tick(float DeltaTime)
 	if (CleanLanding && Grounded && PotentialPoints > 0) {
 		TotalScore = TotalScore + PotentialPoints;
 		PotentialPoints = 0;
-		ForwardVector.Z = ForwardVector.Z - 100.0f;
+		//ForwardVector.Z = ForwardVector.Z - 100.0f;
 	}
 	if (!CleanLanding && Grounded && PotentialPoints > 0) {
 		PotentialPoints = 0;
-		ForwardVector.Z = ForwardVector.Z - 100.0f;
+		//ForwardVector.Z = ForwardVector.Z - 100.0f;
 	}
 
 	AdjustCamera(DeltaTime);
@@ -86,6 +93,9 @@ void ABoarder::Move_XAxis(float AxisValue)
 		PotentialPoints = PotentialPoints + (FMath::Abs(AxisValue) * InAirRotationSpeed);
 		//if (GEngine)
 		//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Move XAxis Pitch: %f"), NewRotation.Pitch));
+	}
+	else {
+		MaxVelocity = OriginalForwardVelocity + ((MaxVelocity / 4) * AxisValue);
 	}
 }
 
