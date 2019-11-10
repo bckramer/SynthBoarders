@@ -20,7 +20,6 @@ ABoarder::ABoarder()
 	MainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("MainCamera"));
 	MainCamera->SetupAttachment(CameraSpringArm, USpringArmComponent::SocketName);
 
-
 }
 
 // Called when the game starts or when spawned
@@ -36,39 +35,45 @@ void ABoarder::BeginPlay()
 void ABoarder::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	ForwardVector = ForwardVector + (ForwardVelocity * GetActorForwardVector());
-	FVector NewForward = FMath::VInterpTo(ForwardVector, ForwardVector.GetClampedToMaxSize(MaxVelocity), DeltaTime, Acceleration);
-	ForwardVector.X = FMath::Clamp(NewForward.X, 0.0f, MaxVelocity);
-	ForwardVector.Y = NewForward.Y;
-	if (Grounded) {
-		ForwardVector.Z = -100.0f;
-	}
-	else {
-		ForwardVector.Z = NewForward.Z;
-	}
-	
-	// if (GEngine)
-	//  	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("X: %f Y: %f Z: %f"), ForwardVector.X, ForwardVector.Y, ForwardVector.Z));
-	NewRotation.Roll = GetActorRotation().Roll;
-	SetActorLocation(FMath::VInterpTo(GetActorLocation(), GetActorLocation() + ForwardVector, DeltaTime, InterpSpeed));
-	SetActorRotation(FMath::RInterpTo(GetActorRotation(), NewRotation, DeltaTime, RotationInterpSpeed));
-	Rider->SetRelativeRotation(FMath::RInterpTo(Rider->RelativeRotation, NewRiderRotation, DeltaTime, RollSensitivity));
+	if (!Victory) {
+		ForwardVector = ForwardVector + (ForwardVelocity * GetActorForwardVector());
+		FVector NewForward = FMath::VInterpTo(ForwardVector, ForwardVector.GetClampedToMaxSize(MaxVelocity), DeltaTime, Acceleration);
+		ForwardVector.X = FMath::Clamp(NewForward.X, 0.0f, MaxVelocity);
+		ForwardVector.Y = NewForward.Y;
+		if (Grounded) {
+			ForwardVector.Z = -100.0f;
+		}
+		else {
+			ForwardVector.Z = NewForward.Z;
+		}
+
+		// if (GEngine)
+		//  	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("X: %f Y: %f Z: %f"), ForwardVector.X, ForwardVector.Y, ForwardVector.Z));
+		NewRotation.Roll = GetActorRotation().Roll;
+		SetActorLocation(FMath::VInterpTo(GetActorLocation(), GetActorLocation() + ForwardVector, DeltaTime, InterpSpeed));
+		SetActorRotation(FMath::RInterpTo(GetActorRotation(), NewRotation, DeltaTime, RotationInterpSpeed));
+		Rider->SetRelativeRotation(FMath::RInterpTo(Rider->RelativeRotation, NewRiderRotation, DeltaTime, RollSensitivity));
 
 
-	if (TotalScore > TierTwoThreshold) {
-		CurrentTierTheshold = TierThreeThreshold;
-	} else if (TotalScore > TierOneThreshold) {
-		CurrentTierTheshold = TierTwoThreshold;
-	}
+		if (TotalScore > TierTwoThreshold) {
+			CurrentTierTheshold = TierThreeThreshold;
+		}
+		else if (TotalScore > TierOneThreshold) {
+			CurrentTierTheshold = TierTwoThreshold;
+		}
 
-	if (CleanLanding && Grounded && PotentialPoints > 0) {
-		TotalScore = TotalScore + PotentialPoints;
-		PotentialPoints = 0;
-		//ForwardVector.Z = ForwardVector.Z - 100.0f;
-	}
-	if (!CleanLanding && Grounded && PotentialPoints > 0) {
-		PotentialPoints = 0;
-		//ForwardVector.Z = ForwardVector.Z - 100.0f;
+		if (CleanLanding && Grounded && PotentialPoints > 0) {
+			TotalScore = TotalScore + PotentialPoints;
+			PotentialPoints = 0;
+			//ForwardVector.Z = ForwardVector.Z - 100.0f;
+		}
+		if (!CleanLanding && Grounded && PotentialPoints > 0) {
+			PotentialPoints = 0;
+			//ForwardVector.Z = ForwardVector.Z - 100.0f;
+		}
+		if (GetActorLocation().X > 127990.0f) {
+			Victory = true;
+		}
 	}
 
 	AdjustCamera(DeltaTime);
