@@ -106,5 +106,6 @@ public:
 	void AdjustCamera(float DeltaTime);
 	void Move_XAxis(float AxisValue);
 	void Move_YAxis(float AxisValue);
+	void Boost(float AxisValue);
 
 };

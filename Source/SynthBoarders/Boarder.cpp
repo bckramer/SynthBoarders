@@ -80,6 +80,7 @@ void ABoarder::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	InputComponent->BindAxis("MoveX", this, &ABoarder::Move_XAxis);
 	InputComponent->BindAxis("MoveY", this, &ABoarder::Move_YAxis);
+	InputComponent->BindAxis("Boost", this, &ABoarder::Boost);
 
 }
 
@@ -93,9 +94,6 @@ void ABoarder::Move_XAxis(float AxisValue)
 		PotentialPoints = PotentialPoints + (FMath::Abs(AxisValue) * InAirRotationSpeed);
 		//if (GEngine)
 		//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Move XAxis Pitch: %f"), NewRotation.Pitch));
-	}
-	else {
-		MaxVelocity = OriginalForwardVelocity + ((MaxVelocity / 4) * AxisValue);
 	}
 }
 
@@ -116,11 +114,29 @@ void ABoarder::Move_YAxis(float AxisValue)
 	}
 }
 
+void ABoarder::Boost(float AxisValue)
+{
+	if (Grounded)
+	{
+		MaxVelocity = OriginalForwardVelocity + ((MaxVelocity / 2) * AxisValue);
+	}
+}
+
 void ABoarder::AdjustCamera(float DeltaTime)
 {
+	FVector Forward = UKismetMathLibrary::GetForwardVector(GetActorRotation());
+	float ExtraZ = 0.0f;
+	if (!Grounded) {
+		ExtraZ = 1000.0f;
+	}
+	else if (Forward.Z > 0.0f) {
+		ExtraZ = (Forward.Z * 1000.0f);
+	}
+
+
 	FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(CameraSpringArm->GetComponentLocation(), GetActorLocation());
 	CameraSpringArm->SetWorldLocation(FMath::VInterpTo(CameraSpringArm->GetComponentLocation(),
-		GetActorLocation() + (UKismetMathLibrary::GetForwardVector(LookAtRotation) * FVector(CameraOffset, 0.0f, -1500.0f)), DeltaTime, CameraLocationLag));
+		GetActorLocation() + (UKismetMathLibrary::GetForwardVector(LookAtRotation) * FVector(CameraOffset, 0.0f, -ZBuffer - ExtraZ)), DeltaTime, CameraLocationLag));
 
 	CameraSpringArm->SetWorldRotation(FMath::RInterpTo(CameraSpringArm->GetComponentRotation(), FRotator(LookAtRotation.Pitch, LookAtRotation.Yaw, 0.0f), DeltaTime, CameraRotationLag));
 }
