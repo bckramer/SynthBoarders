@@ -51,6 +51,15 @@ void ABoarder::Tick(float DeltaTime)
 	} else if (TotalScore > TierOneThreshold) {
 		CurrentTierTheshold = TierTwoThreshold;
 	}
+
+	if (CleanLanding && Grounded && PotentialPoints > 0) {
+		TotalScore = TotalScore + PotentialPoints;
+		PotentialPoints = 0;
+	}
+	if (!CleanLanding && Grounded && PotentialPoints > 0) {
+		PotentialPoints = 0;
+	}
+
 	AdjustCamera(DeltaTime);
 }
 
@@ -70,7 +79,7 @@ void ABoarder::Move_XAxis(float AxisValue)
 	{
 		FRotator Rotator = FRotator(AxisValue * (InAirRotationSpeed / FlipModifier), 0.0f, 0.0f);
 		AddActorWorldRotation(Rotator.Quaternion());
-		TotalScore = TotalScore + (FMath::Abs(AxisValue) * InAirRotationSpeed);
+		PotentialPoints = PotentialPoints + (FMath::Abs(AxisValue) * InAirRotationSpeed);
 		//if (GEngine)
 		//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Move XAxis Pitch: %f"), NewRotation.Pitch));
 	}
@@ -87,7 +96,7 @@ void ABoarder::Move_YAxis(float AxisValue)
 	else
 	{
 		NewRotation.Yaw = GetActorRotation().Yaw + (AxisValue * InAirRotationSpeed);
-		TotalScore = TotalScore + (FMath::Abs(AxisValue) * InAirRotationSpeed);
+		PotentialPoints = PotentialPoints + (FMath::Abs(AxisValue) * InAirRotationSpeed);
 		//if (GEngine)
 		//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Move YAxis Yaw: %f"), NewRotation.Yaw));
 	}

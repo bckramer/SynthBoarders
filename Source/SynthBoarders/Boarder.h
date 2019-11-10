@@ -67,6 +67,8 @@ public:
 		float Acceleration = 1.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		bool Grounded = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+		bool CleanLanding = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 		float CameraOffset = 1.0f;
@@ -80,6 +82,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Score")
 		int TotalScore = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Score")
+		int PotentialPoints = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Score")
 		int CurrentTierTheshold = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Score")
