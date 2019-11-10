@@ -17,10 +17,12 @@ private:
 	float modeConfidence;
 	int timeSignature;
 	float timeSignatureConfidence;
+	string json;
 
 public:
 	Section(float start, float duration, float confidence, float loudness, float tempo, float tempoConfidence,
-		int key, float keyConfidence, int mode, float modeConfidence, int timeSignature, float timeSignatureConfidence) {
+		int key, float keyConfidence, int mode, float modeConfidence, int timeSignature,
+		float timeSignatureConfidence, string json) {
 		this->start = start;
 		this->duration = duration;
 		this->confidence = confidence;
@@ -33,6 +35,7 @@ public:
 		this->modeConfidence = modeConfidence;
 		this->timeSignature = timeSignature;
 		this->timeSignatureConfidence = timeSignatureConfidence;
+		this->json = json;
 	}
 
 	float getStart();
@@ -47,6 +50,7 @@ public:
 	float getModeConfidence();
 	int getTimeSignature();
 	float getTimeSignatureConfidence();
+	string getJson();
 };
 
 float Section::getStart() {
@@ -95,4 +99,8 @@ int Section::getTimeSignature() {
 
 float Section::getTimeSignatureConfidence() {
 	return timeSignatureConfidence;
+}
+
+string Section::getJson() {
+	return json;
 }

@@ -28,6 +28,7 @@ void ABoarder::BeginPlay()
 {
 	Super::BeginPlay();
 	CurrentTierTheshold = TierOneThreshold;
+	OriginalForwardVelocity = MaxVelocity;
 	
 }
 
@@ -39,7 +40,13 @@ void ABoarder::Tick(float DeltaTime)
 	FVector NewForward = FMath::VInterpTo(ForwardVector, ForwardVector.GetClampedToMaxSize(MaxVelocity), DeltaTime, Acceleration);
 	ForwardVector.X = FMath::Clamp(NewForward.X, 0.0f, MaxVelocity);
 	ForwardVector.Y = NewForward.Y;
-	ForwardVector.Z = NewForward.Z;
+	if (Grounded) {
+		ForwardVector.Z = -100.0f;
+	}
+	else {
+		ForwardVector.Z = NewForward.Z;
+	}
+	
 	// if (GEngine)
 	//  	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("X: %f Y: %f Z: %f"), ForwardVector.X, ForwardVector.Y, ForwardVector.Z));
 	NewRotation.Roll = GetActorRotation().Roll;
@@ -57,11 +64,11 @@ void ABoarder::Tick(float DeltaTime)
 	if (CleanLanding && Grounded && PotentialPoints > 0) {
 		TotalScore = TotalScore + PotentialPoints;
 		PotentialPoints = 0;
-		ForwardVector.Z = ForwardVector.Z - 100.0f;
+		//ForwardVector.Z = ForwardVector.Z - 100.0f;
 	}
 	if (!CleanLanding && Grounded && PotentialPoints > 0) {
 		PotentialPoints = 0;
-		ForwardVector.Z = ForwardVector.Z - 100.0f;
+		//ForwardVector.Z = ForwardVector.Z - 100.0f;
 	}
 
 	AdjustCamera(DeltaTime);
@@ -73,6 +80,7 @@ void ABoarder::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	InputComponent->BindAxis("MoveX", this, &ABoarder::Move_XAxis);
 	InputComponent->BindAxis("MoveY", this, &ABoarder::Move_YAxis);
+	InputComponent->BindAxis("Boost", this, &ABoarder::Boost);
 
 }
 
@@ -106,11 +114,29 @@ void ABoarder::Move_YAxis(float AxisValue)
 	}
 }
 
+void ABoarder::Boost(float AxisValue)
+{
+	if (Grounded)
+	{
+		MaxVelocity = OriginalForwardVelocity + ((MaxVelocity / 2) * AxisValue);
+	}
+}
+
 void ABoarder::AdjustCamera(float DeltaTime)
 {
+	FVector Forward = UKismetMathLibrary::GetForwardVector(GetActorRotation());
+	float ExtraZ = 0.0f;
+	if (!Grounded) {
+		ExtraZ = 1000.0f;
+	}
+	else if (Forward.Z > 0.0f) {
+		ExtraZ = (Forward.Z * 1000.0f);
+	}
+
+
 	FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(CameraSpringArm->GetComponentLocation(), GetActorLocation());
 	CameraSpringArm->SetWorldLocation(FMath::VInterpTo(CameraSpringArm->GetComponentLocation(),
-		GetActorLocation() + (UKismetMathLibrary::GetForwardVector(LookAtRotation) * FVector(CameraOffset, 0.0f, -1500.0f)), DeltaTime, CameraLocationLag));
+		GetActorLocation() + (UKismetMathLibrary::GetForwardVector(LookAtRotation) * FVector(CameraOffset, 0.0f, -ZBuffer - ExtraZ)), DeltaTime, CameraLocationLag));
 
 	CameraSpringArm->SetWorldRotation(FMath::RInterpTo(CameraSpringArm->GetComponentRotation(), FRotator(LookAtRotation.Pitch, LookAtRotation.Yaw, 0.0f), DeltaTime, CameraRotationLag));
 }

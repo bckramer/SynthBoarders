@@ -45,6 +45,7 @@ public:
 		float MovementSpeed = 1.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		float ForwardVelocity = 1.0f;
+		float OriginalForwardVelocity = 1.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		float MaxVelocity = 1.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
@@ -105,5 +106,6 @@ public:
 	void AdjustCamera(float DeltaTime);
 	void Move_XAxis(float AxisValue);
 	void Move_YAxis(float AxisValue);
+	void Boost(float AxisValue);
 
 };

@@ -1,3 +1,6 @@
+#ifndef SEGMENT_H
+#define SEGMENT_H
+
 #include <stdio.h>
 #include <iostream>
 
@@ -13,9 +16,11 @@ private:
 	float loudnessMax;
 	float* pitches;
 	float* timbre;
+	string json;
 
 public:
-	Segment(float start, float duration, float confidence, float loudnessStart, float loudnessMaxTime, float loudnessMax, float* pitches, float* timbre) {
+	Segment(float start, float duration, float confidence, float loudnessStart,
+		float loudnessMaxTime, float loudnessMax, float* pitches, float* timbre, string json) {
 		this->start = start;
 		this->duration = duration;
 		this->confidence = confidence;
@@ -24,6 +29,7 @@ public:
 		this->loudnessMax = loudnessMax;
 		this->pitches = pitches;
 		this->timbre = timbre;
+		this->json = json;
 	}
 	float getStart();
 	float getDuration();
@@ -33,37 +39,8 @@ public:
 	float getLoudnessMax();
 	float* getPitches();
 	float* getTimbre();
+	string getJson();
 
 };
 
-float Segment::getStart() {
-	return start;
-}
-
-float Segment::getDuration() {
-	return duration;
-}
-
-float Segment::getConfidence() {
-	return confidence;
-}
-
-float Segment::getLoudnessStart() {
-	return loudnessStart;
-}
-
-float Segment::getLoudnessMaxTime() {
-	return loudnessMaxTime;
-}
-
-float Segment::getLoudnessMax() {
-	return loudnessMax;
-}
-
-float* Segment::getPitches() {
-	return pitches;
-}
-
-float* Segment::getTimbre() {
-	return timbre;
-}
+#endif

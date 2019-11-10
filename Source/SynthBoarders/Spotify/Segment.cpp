@@ -13,9 +13,11 @@ private:
 	float loudnessMax;
 	float* pitches;
 	float* timbre;
+	string json;
 
 public:
-	Segment(float start, float duration, float confidence, float loudnessStart, float loudnessMaxTime, float loudnessMax, float* pitches, float* timbre) {
+	Segment(float start, float duration, float confidence, float loudnessStart,
+	 float loudnessMaxTime, float loudnessMax, float* pitches, float* timbre, string json) {
 		this->start = start;
 		this->duration = duration;
 		this->confidence = confidence;
@@ -24,6 +26,7 @@ public:
 		this->loudnessMax = loudnessMax;
 		this->pitches = pitches;
 		this->timbre = timbre;
+		this->json = json;
 	}
 	float getStart();
 	float getDuration();
@@ -33,6 +36,7 @@ public:
 	float getLoudnessMax();
 	float* getPitches();
 	float* getTimbre();
+	string getJson();
 
 };
 
@@ -66,4 +70,8 @@ float* Segment::getPitches() {
 
 float* Segment::getTimbre() {
 	return timbre;
+}
+
+string Segment::getJson() {
+	return json;
 }
