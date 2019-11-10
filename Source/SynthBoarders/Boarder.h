@@ -77,8 +77,19 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float ZBuffer = 3.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Score")
 		int TotalScore = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Score")
+		int CurrentTierTheshold = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Score")
+		int PreviousTierTheshold = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Score")
+		int TierOneThreshold = 2000;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Score")
+		int TierTwoThreshold = 8000;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Score")
+		int TierThreeThreshold = 16000;
 
 	FVector ForwardVector = FVector(0.0f, 0.0f, 0.0f);
 	FVector DesiredLocation = FVector(0.0f, 0.0f, 0.0f);
