@@ -98,11 +98,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Score")
 		bool Victory;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		AActor* VisualizerOne;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		AActor* VisualizerTwo;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		AActor* VisualizerThree;
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	FVector ForwardVector = FVector(0.0f, 0.0f, 0.0f);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	FVector LastGroundedLocation = FVector(0.0f, 0.0f, 0.0f);
 	FVector DesiredLocation = FVector(0.0f, 0.0f, 0.0f);
 	FRotator NewRotation = FRotator(0.0f, 0.0f, 0.0f);
 	FRotator NewRiderRotation = FRotator(0.0f, 0.0f, 0.0f);
+	
+	float OriginalMovementSpeed;
 
 	//Input functions
 	void AdjustCamera(float DeltaTime);

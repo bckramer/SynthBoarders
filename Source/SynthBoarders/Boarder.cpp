@@ -28,6 +28,7 @@ void ABoarder::BeginPlay()
 	Super::BeginPlay();
 	CurrentTierTheshold = TierOneThreshold;
 	OriginalForwardVelocity = MaxVelocity;
+	OriginalMovementSpeed = MovementSpeed;
 	
 }
 
@@ -36,10 +37,17 @@ void ABoarder::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if (!Victory) {
+		ForwardVector.Y = 0.0f;
 		ForwardVector = ForwardVector + (ForwardVelocity * GetActorForwardVector());
 		FVector NewForward = FMath::VInterpTo(ForwardVector, ForwardVector.GetClampedToMaxSize(MaxVelocity), DeltaTime, Acceleration);
 		ForwardVector.X = FMath::Clamp(NewForward.X, 0.0f, MaxVelocity);
-		ForwardVector.Y = NewForward.Y;
+		if (Grounded) {
+			ForwardVector.Y = ForwardVector.Y * MovementSpeed;
+		}
+		else 
+		{
+			ForwardVector.Y = NewForward.Z;
+		}
 		if (Grounded) {
 			ForwardVector.Z = -100.0f;
 		}
@@ -54,11 +62,15 @@ void ABoarder::Tick(float DeltaTime)
 		SetActorRotation(FMath::RInterpTo(GetActorRotation(), NewRotation, DeltaTime, RotationInterpSpeed));
 		Rider->SetRelativeRotation(FMath::RInterpTo(Rider->RelativeRotation, NewRiderRotation, DeltaTime, RollSensitivity));
 
-
-		if (TotalScore > TierTwoThreshold) {
+		if (TotalScore > TierThreeThreshold) {
+			VisualizerThree->SetActorScale3D(FVector(10.0f, 10.0f, 10.0f));
+		}
+		else if (TotalScore > TierTwoThreshold) {
 			CurrentTierTheshold = TierThreeThreshold;
+			VisualizerTwo->SetActorScale3D(FVector(10.0f, 10.0f, 10.0f));
 		}
 		else if (TotalScore > TierOneThreshold) {
+			VisualizerOne->SetActorScale3D(FVector(10.0f, 10.0f, 10.0f));
 			CurrentTierTheshold = TierTwoThreshold;
 		}
 
@@ -74,6 +86,10 @@ void ABoarder::Tick(float DeltaTime)
 		if (GetActorLocation().X > 127990.0f) {
 			Victory = true;
 		}
+	}
+	if (GetActorLocation().Z <= 0) {
+		SetActorLocation(LastGroundedLocation);
+		CameraSpringArm->SetWorldLocation(GetActorLocation());
 	}
 
 	AdjustCamera(DeltaTime);
@@ -123,7 +139,8 @@ void ABoarder::Boost(float AxisValue)
 {
 	if (Grounded)
 	{
-		MaxVelocity = OriginalForwardVelocity + ((MaxVelocity / 2) * AxisValue);
+		MaxVelocity = OriginalForwardVelocity + ((MaxVelocity / 2.0f) * AxisValue);
+		MovementSpeed = OriginalMovementSpeed / 3.0f;
 	}
 }
 
@@ -135,7 +152,7 @@ void ABoarder::AdjustCamera(float DeltaTime)
 		ExtraZ = 1000.0f;
 	}
 	else if (Forward.Z > 0.0f) {
-		ExtraZ = (Forward.Z * 1000.0f);
+		ExtraZ = (Forward.Z * 500.0f);
 	}
 
 
